@@ -1,0 +1,3474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Thói quen Hàng ngày</title>
+    <style>
+        :root {
+            --primary-color: #B39DDB;
+            --secondary-color: #7E57C2;
+            --accent-color: #A5D6A7;
+            --light-color: #f8f9fa;
+            --dark-color: #37474F;
+            --success-color: #81C784;
+            --warning-color: #FFB74D;
+            --danger-color: #E57373;
+            --gray-color: #90A4AE;
+            --border-radius: 16px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --gradient-1: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            --gradient-2: linear-gradient(135deg, var(--accent-color) 0%, var(--primary-color) 100%);
+            --gradient-3: linear-gradient(135deg, var(--danger-color) 0%, var(--warning-color) 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Light mode colors */
+        body.light-mode {
+            --primary-color: #6A5ACD;
+            --secondary-color: #8A2BE2;
+            --accent-color: #32CD32;
+            --dark-color: #FFFFFF;
+            --success-color: #228B22;
+            --warning-color: #FF8C00;
+            --danger-color: #DC143C;
+            --gray-color: #696969;
+            --glass-bg: rgba(0, 0, 0, 0.1);
+            --glass-border: rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        body.light-mode::before {
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(106, 90, 205, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(50, 205, 50, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 140, 0, 0.05) 0%, transparent 70%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--dark-color);
+            color: white;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode {
+            color: #333;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(179, 157, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(165, 214, 167, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 183, 77, 0.05) 0%, transparent 70%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-20px, -20px) rotate(90deg); }
+            50% { transform: translate(20px, -10px) rotate(180deg); }
+            75% { transform: translate(-10px, 20px) rotate(270deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            margin-bottom: 40px;
+            background: var(--gradient-1);
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.02) 10px,
+                rgba(255, 255, 255, 0.02) 20px
+            );
+            animation: patternMove 10s linear infinite;
+        }
+
+        @keyframes patternMove {
+            0% { transform: translateX(-20px); }
+            100% { transform: translateX(20px); }
+        }
+
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            animation: titleGlow 3s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+            50% { text-shadow: 0 0 30px rgba(255, 255, 255, 0.5), 0 0 40px rgba(165, 214, 167, 0.3); }
+        }
+
+        .app-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .daily-quote {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .daily-quote::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 4rem;
+            color: var(--accent-color);
+            opacity: 0.3;
+            font-family: serif;
+        }
+
+        .daily-quote::after {
+            content: '"';
+            position: absolute;
+            bottom: -30px;
+            right: 20px;
+            font-size: 4rem;
+            color: var(--accent-color);
+            opacity: 0.3;
+            font-family: serif;
+        }
+
+        .quote-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .quote-author {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        body.light-mode .quote-text {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 8px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            position: relative;
+            z-index: 2;
+        }
+
+        body.light-mode .nav-tab {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .nav-tab.active {
+            background: var(--gradient-2);
+            color: white;
+            box-shadow: 0 8px 25px rgba(165, 214, 167, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab:hover:not(.active) {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        body.light-mode .nav-tab:hover:not(.active) {
+            color: #333;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab .tab-icon {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Today Summary */
+        .today-summary {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .today-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            align-items: center;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.light-mode .summary-label {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .circular-progress {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px;
+        }
+
+        .circular-progress svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .circular-progress .bg-circle {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 8;
+        }
+
+        body.light-mode .circular-progress .bg-circle {
+            stroke: rgba(0, 0, 0, 0.1);
+        }
+
+        .circular-progress .progress-circle {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 220;
+            stroke-dashoffset: 220;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .circular-progress .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        body.light-mode .circular-progress .progress-text {
+            color: #333;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action {
+            padding: 12px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            border: none;
+        }
+
+        body.light-mode .quick-action {
+            color: #333;
+        }
+
+        .quick-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        body.light-mode .quick-action:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-action.complete-all {
+            background: var(--gradient-2);
+            color: white;
+        }
+
+        .quick-action.skip-all {
+            background: var(--gradient-3);
+            color: white;
+        }
+
+        /* Time-based Categories */
+        .time-categories {
+            margin-bottom: 30px;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 8px 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: none;
+        }
+
+        body.light-mode .category-tab {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .category-tab.active {
+            background: var(--gradient-2);
+            color: white;
+            border-color: transparent;
+        }
+
+        .category-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        body.light-mode .category-tab:hover:not(.active) {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        /* Habit Cards */
+        .habits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .habit-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .habit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-2);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .habit-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .habit-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(165, 214, 167, 0.3);
+        }
+
+        .habit-card.completed {
+            background: linear-gradient(135deg, rgba(129, 199, 132, 0.2) 0%, rgba(165, 214, 167, 0.1) 100%);
+            border-color: var(--success-color);
+        }
+
+        .habit-card.completed::before {
+            background: var(--success-color);
+            transform: scaleX(1);
+        }
+
+        .habit-card.morning {
+            border-left: 4px solid #FFB74D;
+        }
+
+        .habit-card.afternoon {
+            border-left: 4px solid #64B5F6;
+        }
+
+        .habit-card.evening {
+            border-left: 4px solid #9575CD;
+        }
+
+        .habit-card.anytime {
+            border-left: 4px solid #81C784;
+        }
+
+        .habit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .habit-info {
+            flex: 1;
+        }
+
+        .habit-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.light-mode .habit-title {
+            color: #333;
+        }
+
+        .habit-emoji {
+            font-size: 1.4rem;
+        }
+
+        .habit-category {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .habit-time {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-mode .habit-time {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .habit-difficulty {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .habit-difficulty.easy {
+            background: rgba(129, 199, 132, 0.2);
+            color: var(--success-color);
+        }
+
+        .habit-difficulty.medium {
+            background: rgba(255, 183, 77, 0.2);
+            color: var(--warning-color);
+        }
+
+        .habit-difficulty.hard {
+            background: rgba(229, 115, 115, 0.2);
+            color: var(--danger-color);
+        }
+
+        .habit-actions {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .habit-check {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--gray-color);
+            background: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            font-size: 16px;
+        }
+
+        .habit-check.completed {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .habit-check:hover {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+
+        .habit-menu {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .habit-menu {
+            background: rgba(0, 0, 0, 0.1);
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .habit-menu:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        body.light-mode .habit-menu:hover {
+            background: rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        .habit-progress {
+            margin-top: 16px;
+        }
+
+        .habit-streak {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .streak-info {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        body.light-mode .streak-info {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .streak-number {
+            color: var(--warning-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        body.light-mode .progress-bar {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-2);
+            border-radius: 3px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: right;
+        }
+
+        body.light-mode .progress-text {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .habit-notes {
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+
+        body.light-mode .habit-notes {
+            background: rgba(0, 0, 0, 0.05);
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Add Habit Button */
+        .add-habit-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px dashed var(--glass-border);
+            border-radius: var(--border-radius);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        body.light-mode .add-habit-btn {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .add-habit-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(165, 214, 167, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--dark-color);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        body.light-mode .modal-content {
+            background: #FFFFFF;
+            color: #333;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        body.light-mode .modal-title {
+            color: #333;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .modal-close {
+            color: #333;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
+        }
+
+        body.light-mode .modal-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: white;
+            font-weight: 500;
+        }
+
+        body.light-mode .form-label {
+            color: #333;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        body.light-mode .form-input, 
+        body.light-mode .form-select, 
+        body.light-mode .form-textarea {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(165, 214, 167, 0.2);
+        }
+
+        .form-input::placeholder, .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        body.light-mode .form-input::placeholder, 
+        body.light-mode .form-textarea::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-select option {
+            background: var(--dark-color);
+            color: white;
+        }
+
+        body.light-mode .form-select option {
+            background: #FFFFFF;
+            color: #333;
+        }
+
+        .emoji-picker {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        body.light-mode .emoji-picker {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .emoji-option {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.2rem;
+        }
+
+        .emoji-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        body.light-mode .emoji-option:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .emoji-option.selected {
+            background: var(--accent-color);
+            transform: scale(1.2);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(165, 214, 167, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        body.light-mode .btn-secondary {
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        /* Context Menu */
+        .habit-context-menu {
+            position: fixed;
+            background: var(--dark-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 8px 0;
+            z-index: 1001;
+            min-width: 150px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+        }
+
+        body.light-mode .habit-context-menu {
+            background: #FFFFFF;
+        }
+
+        .menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: white;
+            font-size: 14px;
+        }
+
+        body.light-mode .menu-item {
+            color: #333;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .menu-item:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-item.danger {
+            color: var(--danger-color);
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+        }
+
+        body.light-mode .notification {
+            color: #333;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        /* Statistics */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.light-mode .stat-label {
+            color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Calendar */
+        .calendar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        body.light-mode .calendar-title {
+            color: #333;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .calendar-nav-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .calendar-nav-btn {
+            color: #333;
+        }
+
+        .calendar-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .calendar-nav-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            padding: 8px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        body.light-mode .calendar-weekday {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            color: white;
+        }
+
+        body.light-mode .calendar-day {
+            color: #333;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .calendar-day:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-day.other-month {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        body.light-mode .calendar-day.other-month {
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        .calendar-day.today {
+            background: var(--gradient-2);
+            color: white;
+        }
+
+        .calendar-day.has-habits::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 50%;
+        }
+
+        .calendar-day.completed::after {
+            background: var(--success-color);
+        }
+
+        .calendar-day.partial::after {
+            background: var(--warning-color);
+        }
+
+        /* Settings */
+        .settings-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        body.light-mode .settings-title {
+            color: #333;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.light-mode .setting-item {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        body.light-mode .setting-label {
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .setting-description {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 2px;
+        }
+
+        body.light-mode .setting-description {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        body.light-mode .toggle-switch {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-color);
+        }
+
+        .toggle-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-switch.active .toggle-handle {
+            transform: translateX(26px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .habits-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+
+            .app-title {
+                font-size: 2rem;
+            }
+
+            .nav-tab {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions {
+                justify-content: center;
+            }
+
+            .category-tabs {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-day {
+                font-size: 0.8rem;
+            }
+
+            .habit-card {
+                padding: 16px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Time Suggestion Panel */
+        .time-suggestion-panel {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            z-index: 1500;
+            max-width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-title {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        body.light-mode .suggestion-title {
+            color: #333;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        body.light-mode .suggestion-item {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        body.light-mode .suggestion-item:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion-time {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .suggestion-reason {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+        }
+
+        body.light-mode .suggestion-reason {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Pull-to-refresh styles */
+        .pull-to-refresh {
+            position: fixed;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            padding: 15px 25px;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 2000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body.light-mode .pull-to-refresh {
+            color: #333;
+        }
+
+        .pull-to-refresh.active {
+            top: 20px;
+        }
+
+        .refresh-icon {
+            width: 20px;
+            height: 20px;
+            border: 2px solid currentColor;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Auto refresh indicator */
+        .auto-refresh-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            color: white;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        body.light-mode .auto-refresh-indicator {
+            color: #333;
+        }
+
+        .auto-refresh-indicator.show {
+            opacity: 1;
+        }
+
+        /* Page refresh transition */
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-1);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .page-transition.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .transition-content {
+            text-align: center;
+            color: white;
+        }
+
+        .transition-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        /* Animation classes */
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="app-title">🌟 Quản lý Thói quen Hàng ngày</h1>
+            <p class="app-subtitle">Xây dựng thói quen tốt, thay đổi cuộc sống từng ngày</p>
+        </header>
+
+        <!-- Daily Quote -->
+        <div class="daily-quote">
+            <p class="quote-text">Thành công là tổng của những nỗ lực nhỏ được lặp lại ngày này qua ngày khác.</p>
+            <p class="quote-author">- Robert Collier</p>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="today">
+                <span class="tab-icon">🏠</span>Hôm nay
+            </button>
+            <button class="nav-tab" data-tab="stats">
+                <span class="tab-icon">📊</span>Thống kê
+            </button>
+            <button class="nav-tab" data-tab="calendar">
+                <span class="tab-icon">📅</span>Lịch
+            </button>
+            <button class="nav-tab" data-tab="settings">
+                <span class="tab-icon">⚙️</span>Cài đặt
+            </button>
+        </nav>
+
+        <!-- Today Tab -->
+        <div class="tab-content active" id="today-tab">
+            <!-- Today Summary -->
+            <div class="today-summary">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="circular-progress">
+                            <svg>
+                                <defs>
+                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#A5D6A7"/>
+                                        <stop offset="100%" style="stop-color:#B39DDB"/>
+                                    </linearGradient>
+                                </defs>
+                                <circle class="bg-circle" cx="40" cy="40" r="35"/>
+                                <circle class="progress-circle" cx="40" cy="40" r="35" style="stroke-dashoffset: 66;"/>
+                            </svg>
+                            <div class="progress-text">70%</div>
+                        </div>
+                        <div class="summary-label">Hoàn thành hôm nay</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">4/6</div>
+                        <div class="summary-label">Thói quen hoàn thành</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">🔥 15</div>
+                        <div class="summary-label">Streak dài nhất</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">⭐ 42</div>
+                        <div class="summary-label">Ngày hoạt động</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="quick-action complete-all">
+                    <span>✅</span>Hoàn thành tất cả
+                </button>
+                <button class="quick-action skip-all">
+                    <span>⏭️</span>Bỏ qua hôm nay
+                </button>
+                <button class="quick-action refresh-data" onclick="manualRefresh()">
+                    <span>🔄</span>Làm mới
+                </button>
+            </div>
+
+            <!-- Time Categories -->
+            <div class="time-categories">
+                <div class="category-tabs">
+                    <button class="category-tab active" data-category="all">Tất cả</button>
+                    <button class="category-tab" data-category="morning">🌅 Buổi sáng</button>
+                    <button class="category-tab" data-category="afternoon">☀️ Buổi chiều</button>
+                    <button class="category-tab" data-category="evening">🌙 Buổi tối</button>
+                    <button class="category-tab" data-category="anytime">⏰ Bất kỳ lúc nào</button>
+                </div>
+
+                <!-- Habit Cards -->
+                <div class="habits-grid">
+                    <!-- Morning Habits -->
+                    <div class="habit-card morning">
+                        <div class="habit-header">
+                            <div class="habit-info">
+                                <h3 class="habit-title">
+                                    <span class="habit-emoji">🏃‍♂️</span>
+                                    Chạy bộ buổi sáng
+                                </h3>
+                                <p class="habit-category">Sức khỏe</p>
+                                <p class="habit-time">6:00 - 7:00</p>
+                                <span class="habit-difficulty medium">Trung bình</span>
+                            </div>
+                            <div class="habit-actions">
+                                <button class="habit-check">✓</button>
+                                <button class="habit-menu">⋯</button>
+                            </div>
+                        </div>
+                        <div class="habit-progress">
+                            <div class="habit-streak">
+                                <span class="streak-info">Streak hiện tại</span>
+                                <span class="streak-number">🔥 7 ngày</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 70%;"></div>
+                            </div>
+                            <div class="progress-text">70% tuần này</div>
+                        </div>
+                        <div class="habit-notes">
+                            Chạy ở công viên gần nhà, tăng cường sức khỏe tim mạch và tinh thần.
+                        </div>
+                    </div>
+
+                    <div class="habit-card morning completed">
+                        <div class="habit-header">
+                            <div class="habit-info">
+                                <h3 class="habit-title">
+                                    <span class="habit-emoji">🧘‍♀️</span>
+                                    Thiền 15 phút
+                                </h3>
+                                <p class="habit-category">Tinh thần</p>
+                                <p class="habit-time">6:30 - 6:45</p>
+                                <span class="habit-difficulty easy">Dễ</span>
+                            </div>
+                            <div class="habit-actions">
+                                <button class="habit-check completed">✓</button>
+                                <button class="habit-menu">⋯</button>
+                            </div>
+                        </div>
+                        <div class="habit-progress">
+                            <div class="habit-streak">
+                                <span class="streak-info">Streak hiện tại</span>
+                                <span class="streak-number">🔥 3 ngày</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 43%;"></div>
+                            </div>
+                            <div class="progress-text">43% tuần này</div>
+                        </div>
+                        <div class="habit-notes">
+                            Thiền mindfulness để bắt đầu ngày mới với tâm trạng bình an.
+                        </div>
+                    </div>
+
+                    <!-- Afternoon Habits -->
+                    <div class="habit-card afternoon completed">
+                        <div class="habit-header">
+                            <div class="habit-info">
+                                <h3 class="habit-title">
+                                    <span class="habit-emoji">🥗</span>
+                                    Ăn trái cây
+                                </h3>
+                                <p class="habit-category">Dinh dưỡng</p>
+                                <p class="habit-time">14:00 - 14:15</p>
+                                <span class="habit-difficulty easy">Dễ</span>
+                            </div>
+                            <div class="habit-actions">
+                                <button class="habit-check completed">✓</button>
+                                <button class="habit-menu">⋯</button>
+                            </div>
+                        </div>
+                        <div class="habit-progress">
+                            <div class="habit-streak">
+                                <span class="streak-info">Streak hiện tại</span>
+                                <span class="streak-number">🔥 9 ngày</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 71%;"></div>
+                            </div>
+                            <div class="progress-text">71% tuần này</div>
+                        </div>
+                        <div class="habit-notes">
+                            Bổ sung vitamin và chất xơ cho cơ thể vào buổi chiều.
+                        </div>
+                    </div>
+
+                    <!-- Evening Habits -->
+                    <div class="habit-card evening completed">
+                        <div class="habit-header">
+                            <div class="habit-info">
+                                <h3 class="habit-title">
+                                    <span class="habit-emoji">📚</span>
+                                    Đọc sách 30 phút
+                                </h3>
+                                <p class="habit-category">Học tập</p>
+                                <p class="habit-time">20:00 - 20:30</p>
+                                <span class="habit-difficulty easy">Dễ</span>
+                            </div>
+                            <div class="habit-actions">
+                                <button class="habit-check completed">✓</button>
+                                <button class="habit-menu">⋯</button>
+                            </div>
+                        </div>
+                        <div class="habit-progress">
+                            <div class="habit-streak">
+                                <span class="streak-info">Streak hiện tại</span>
+                                <span class="streak-number">🔥 15 ngày</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%;"></div>
+                            </div>
+                            <div class="progress-text">100% tuần này</div>
+                        </div>
+                        <div class="habit-notes">
+                            Đọc sách self-help và tiểu thuyết để mở rộng kiến thức.
+                        </div>
+                    </div>
+
+                    <div class="habit-card evening">
+                        <div class="habit-header">
+                            <div class="habit-info">
+                                <h3 class="habit-title">
+                                    <span class="habit-emoji">📝</span>
+                                    Viết nhật ký
+                                </h3>
+                                <p class="habit-category">Cá nhân</p>
+                                <p class="habit-time">21:00 - 21:15</p>
+                                <span class="habit-difficulty easy">Dễ</span>
+                            </div>
+                            <div class="habit-actions">
+                                <button class="habit-check">✓</button>
+                                <button class="habit-menu">⋯</button>
+                            </div>
+                        </div>
+                        <div class="habit-progress">
+                            <div class="habit-streak">
+                                <span class="streak-info">Streak hiện tại</span>
+                                <span class="streak-number">🔥 5 ngày</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 57%;"></div>
+                            </div>
+                            <div class="progress-text">57% tuần này</div>
+                        </div>
+                        <div class="habit-notes">
+                            Ghi lại những suy nghĩ và cảm xúc trong ngày.
+                        </div>
+                    </div>
+
+                    <!-- Anytime Habits -->
+                    <div class="habit-card anytime completed">
+                        <div class="habit-header">
+                            <div class="habit-info">
+                                <h3 class="habit-title">
+                                    <span class="habit-emoji">💧</span>
+                                    Uống 2L nước
+                                </h3>
+                                <p class="habit-category">Sức khỏe</p>
+                                <p class="habit-time">Cả ngày</p>
+                                <span class="habit-difficulty medium">Trung bình</span>
+                            </div>
+                            <div class="habit-actions">
+                                <button class="habit-check completed">✓</button>
+                                <button class="habit-menu">⋯</button>
+                            </div>
+                        </div>
+                        <div class="habit-progress">
+                            <div class="habit-streak">
+                                <span class="streak-info">Streak hiện tại</span>
+                                <span class="streak-number">🔥 12 ngày</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 86%;"></div>
+                            </div>
+                            <div class="progress-text">86% tuần này</div>
+                        </div>
+                        <div class="habit-notes">
+                            Theo dõi lượng nước uống để duy trì độ ẩm cho cơ thể.
+                        </div>
+                    </div>
+
+                    <!-- Add Habit Button -->
+                    <button class="add-habit-btn" onclick="openModal('add-habit-modal')">
+                        <span>+</span>
+                        Thêm thói quen mới
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div class="tab-content" id="stats-tab">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-value" id="total-habits">6</div>
+                    <div class="stat-label">Thói quen đang theo dõi</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">Streak dài nhất</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-value" id="completion-rate">71%</div>
+                    <div class="stat-label">Tỷ lệ hoàn thành</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">Ngày hoạt động</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendar Tab -->
+        <div class="tab-content" id="calendar-tab">
+            <div class="calendar">
+                <div class="calendar-header">
+                    <h3 class="calendar-title" id="calendar-title">Tháng 5, 2025</h3>
+                    <div class="calendar-nav">
+                        <button class="calendar-nav-btn" id="prev-month">‹</button>
+                        <button class="calendar-nav-btn" id="next-month">›</button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday">T2</div>
+                    <div class="calendar-weekday">T3</div>
+                    <div class="calendar-weekday">T4</div>
+                    <div class="calendar-weekday">T5</div>
+                    <div class="calendar-weekday">T6</div>
+                    <div class="calendar-weekday">T7</div>
+                    <div class="calendar-weekday">CN</div>
+                </div>
+                <div class="calendar-grid" id="calendar-grid">
+                    <!-- Calendar days will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value" id="days-in-month">31</div>
+                    <div class="stat-label">Ngày trong tháng</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value">28</div>
+                    <div class="stat-label">Ngày hoàn thành</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value">90%</div>
+                    <div class="stat-label">Tỷ lệ thành công</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-value" id="monthly-habits">168</div>
+                    <div class="stat-label">Thói quen hoàn thành</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-panel">
+                <div class="settings-group">
+                    <h3 class="settings-title">⚙️ Cài đặt chung</h3>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Chế độ tối</div>
+                            <div class="setting-description">Giao diện tối để bảo vệ mắt</div>
+                        </div>
+                        <div class="toggle-switch active" id="dark-mode-toggle">
+                            <div class="toggle-handle"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Âm thanh hoàn thành</div>
+                            <div class="setting-description">Phát âm thanh khi hoàn thành thói quen</div>
+                        </div>
+                        <div class="toggle-switch" id="sound-toggle">
+                            <div class="toggle-handle"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Thông báo push</div>
+                            <div class="setting-description">Nhận thông báo nhắc nhở thói quen</div>
+                        </div>
+                        <div class="toggle-switch active" id="notification-toggle">
+                            <div class="toggle-handle"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3 class="settings-title">🎯 Mục tiêu</h3>
+                    
+                    <div class="setting-item">
+                        <div>
+                            <div class="setting-label">Mục tiêu hàng ngày</div>
+                            <div class="setting-description">Số thói quen tối thiểu mỗi ngày</div>
+                        </div>
+                        <select class="form-select" style="width: auto;" id="daily-goal">
+                            <option value="3">3 thói quen</option>
+                            <option value="4">4 thói quen</option>
+                            <option value="5" selected>5 thói quen</option>
+                            <option value="6">6 thói quen</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3 class="settings-title">📱 Dữ liệu</h3>
+                    
+                    <div class="setting-item">
+                        <button class="btn btn-secondary" onclick="exportData()">📤 Xuất dữ liệu</button>
+                        <button class="btn btn-secondary" onclick="clearAllData()">🗑️ Xóa tất cả dữ liệu</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Habit Modal -->
+    <div class="modal" id="add-habit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">➕ Thêm thói quen mới</h3>
+                <button class="modal-close" onclick="closeModal('add-habit-modal')">&times;</button>
+            </div>
+            
+            <form id="habit-form">
+                <div class="form-group">
+                    <label class="form-label">Emoji & Tên thói quen</label>
+                    <div style="display: flex; gap: 12px;">
+                        <input type="text" id="selected-emoji" value="🎯" style="width: 60px; text-align: center; font-size: 1.4rem;" readonly>
+                        <input type="text" id="habit-name" class="form-input" style="flex: 1;" placeholder="VD: Chạy bộ buổi sáng" required>
+                    </div>
+                    <div class="emoji-picker">
+                        <div class="emoji-option selected" data-emoji="🎯">🎯</div>
+                        <div class="emoji-option" data-emoji="🏃‍♂️">🏃‍♂️</div>
+                        <div class="emoji-option" data-emoji="🧘‍♀️">🧘‍♀️</div>
+                        <div class="emoji-option" data-emoji="📚">📚</div>
+                        <div class="emoji-option" data-emoji="💧">💧</div>
+                        <div class="emoji-option" data-emoji="📝">📝</div>
+                        <div class="emoji-option" data-emoji="🥗">🥗</div>
+                        <div class="emoji-option" data-emoji="💪">💪</div>
+                        <div class="emoji-option" data-emoji="🎨">🎨</div>
+                        <div class="emoji-option" data-emoji="🎵">🎵</div>
+                        <div class="emoji-option" data-emoji="🌱">🌱</div>
+                        <div class="emoji-option" data-emoji="☕">☕</div>
+                        <div class="emoji-option" data-emoji="🧼">🧼</div>
+                        <div class="emoji-option" data-emoji="🛏️">🛏️</div>
+                        <div class="emoji-option" data-emoji="📱">📱</div>
+                        <div class="emoji-option" data-emoji="🚗">🚗</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Mô tả chi tiết</label>
+                    <textarea id="habit-description" class="form-textarea" placeholder="Mô tả về thói quen này và lý do bạn muốn thực hiện..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Danh mục</label>
+                        <select id="habit-category" class="form-select" required>
+                            <option value="">Chọn danh mục</option>
+                            <option value="health">🏃‍♂️ Sức khỏe</option>
+                            <option value="learning">📚 Học tập</option>
+                            <option value="mindfulness">🧘‍♀️ Tinh thần</option>
+                            <option value="nutrition">🥗 Dinh dưỡng</option>
+                            <option value="personal">📝 Cá nhân</option>
+                            <option value="work">💼 Công việc</option>
+                            <option value="social">👥 Xã hội</option>
+                            <option value="creative">🎨 Sáng tạo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Độ khó</label>
+                        <select id="habit-difficulty" class="form-select" required>
+                            <option value="easy">Dễ</option>
+                            <option value="medium" selected>Trung bình</option>
+                            <option value="hard">Khó</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Thời gian bắt đầu</label>
+                        <input type="time" id="habit-start-time" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Thời gian kết thúc</label>
+                        <input type="time" id="habit-end-time" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Khung thời gian</label>
+                    <select id="habit-timeframe" class="form-select" required>
+                        <option value="morning">🌅 Buổi sáng (5:00 - 12:00)</option>
+                        <option value="afternoon">☀️ Buổi chiều (12:00 - 18:00)</option>
+                        <option value="evening">🌙 Buổi tối (18:00 - 23:00)</option>
+                        <option value="anytime">⏰ Bất kỳ lúc nào</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tần suất</label>
+                    <select id="habit-frequency" class="form-select" required>
+                        <option value="daily" selected>Hàng ngày</option>
+                        <option value="weekly">Hàng tuần</option>
+                        <option value="custom">Tùy chỉnh</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('add-habit-modal')">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Thêm thói quen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Habit Modal -->
+    <div class="modal" id="edit-habit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Chỉnh sửa thói quen</h3>
+                <button class="modal-close" onclick="closeModal('edit-habit-modal')">&times;</button>
+            </div>
+            
+            <form id="edit-habit-form">
+                <div class="form-group">
+                    <label class="form-label">Emoji & Tên thói quen</label>
+                    <div style="display: flex; gap: 12px;">
+                        <input type="text" id="edit-selected-emoji" value="🎯" style="width: 60px; text-align: center; font-size: 1.4rem;" readonly>
+                        <input type="text" id="edit-habit-name" class="form-input" style="flex: 1;" placeholder="VD: Chạy bộ buổi sáng" required>
+                    </div>
+                    <div class="emoji-picker" id="edit-emoji-picker">
+                        <div class="emoji-option selected" data-emoji="🎯">🎯</div>
+                        <div class="emoji-option" data-emoji="🏃‍♂️">🏃‍♂️</div>
+                        <div class="emoji-option" data-emoji="🧘‍♀️">🧘‍♀️</div>
+                        <div class="emoji-option" data-emoji="📚">📚</div>
+                        <div class="emoji-option" data-emoji="💧">💧</div>
+                        <div class="emoji-option" data-emoji="📝">📝</div>
+                        <div class="emoji-option" data-emoji="🥗">🥗</div>
+                        <div class="emoji-option" data-emoji="💪">💪</div>
+                        <div class="emoji-option" data-emoji="🎨">🎨</div>
+                        <div class="emoji-option" data-emoji="🎵">🎵</div>
+                        <div class="emoji-option" data-emoji="🌱">🌱</div>
+                        <div class="emoji-option" data-emoji="☕">☕</div>
+                        <div class="emoji-option" data-emoji="🧼">🧼</div>
+                        <div class="emoji-option" data-emoji="🛏️">🛏️</div>
+                        <div class="emoji-option" data-emoji="📱">📱</div>
+                        <div class="emoji-option" data-emoji="🚗">🚗</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Mô tả chi tiết</label>
+                    <textarea id="edit-habit-description" class="form-textarea" placeholder="Mô tả về thói quen này và lý do bạn muốn thực hiện..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Danh mục</label>
+                        <select id="edit-habit-category" class="form-select" required>
+                            <option value="">Chọn danh mục</option>
+                            <option value="health">🏃‍♂️ Sức khỏe</option>
+                            <option value="learning">📚 Học tập</option>
+                            <option value="mindfulness">🧘‍♀️ Tinh thần</option>
+                            <option value="nutrition">🥗 Dinh dưỡng</option>
+                            <option value="personal">📝 Cá nhân</option>
+                            <option value="work">💼 Công việc</option>
+                            <option value="social">👥 Xã hội</option>
+                            <option value="creative">🎨 Sáng tạo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Độ khó</label>
+                        <select id="edit-habit-difficulty" class="form-select" required>
+                            <option value="easy">Dễ</option>
+                            <option value="medium">Trung bình</option>
+                            <option value="hard">Khó</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Thời gian bắt đầu</label>
+                        <input type="time" id="edit-habit-start-time" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Thời gian kết thúc</label>
+                        <input type="time" id="edit-habit-end-time" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Khung thời gian</label>
+                    <select id="edit-habit-timeframe" class="form-select" required>
+                        <option value="morning">🌅 Buổi sáng (5:00 - 12:00)</option>
+                        <option value="afternoon">☀️ Buổi chiều (12:00 - 18:00)</option>
+                        <option value="evening">🌙 Buổi tối (18:00 - 23:00)</option>
+                        <option value="anytime">⏰ Bất kỳ lúc nào</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tần suất</label>
+                    <select id="edit-habit-frequency" class="form-select" required>
+                        <option value="daily">Hàng ngày</option>
+                        <option value="weekly">Hàng tuần</option>
+                        <option value="custom">Tùy chỉnh</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('edit-habit-modal')">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Cập nhật thói quen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Time Suggestion Panel -->
+    <div class="time-suggestion-panel" id="time-suggestion-panel" style="display: none;">
+        <div class="suggestion-content">
+            <h4 class="suggestion-title">💡 Đề xuất thời gian tối ưu</h4>
+            <div class="suggestion-list" id="suggestion-list">
+                <!-- Time suggestions will be populated here -->
+            </div>
+            <button class="btn btn-secondary" onclick="closeSuggestionPanel()">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Pull to Refresh Indicator -->
+    <div class="pull-to-refresh" id="pull-to-refresh">
+        <div class="refresh-icon"></div>
+        <span>Kéo để làm mới...</span>
+    </div>
+
+    <!-- Auto Refresh Indicator -->
+    <div class="auto-refresh-indicator" id="auto-refresh-indicator">
+        Đã cập nhật dữ liệu
+    </div>
+
+    <!-- Page Transition -->
+    <div class="page-transition" id="page-transition">
+        <div class="transition-content">
+            <div class="transition-spinner"></div>
+            <div>Đang làm mới dữ liệu...</div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Audio for completion sound -->
+    <audio id="completion-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmAaBTeM0vLOeSgF" type="audio/wav">
+    </audio>
+
+    <script>
+        // Global variables
+        let currentTab = 'today';
+        let currentCategory = 'all';
+        let habitIdCounter = 1000;
+        let currentDate = new Date();
+        let darkMode = true;
+        let soundEnabled = false;
+        let notificationsEnabled = true;
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const savedDarkMode = localStorage.getItem('darkMode');
+            const savedSound = localStorage.getItem('soundEnabled');
+            const savedNotifications = localStorage.getItem('notificationsEnabled');
+
+            if (savedDarkMode !== null) {
+                darkMode = savedDarkMode === 'true';
+            }
+            if (savedSound !== null) {
+                soundEnabled = savedSound === 'true';
+            }
+            if (savedNotifications !== null) {
+                notificationsEnabled = savedNotifications === 'true';
+            }
+
+            applySettings();
+        }
+
+        // Apply settings to UI
+        function applySettings() {
+            if (!darkMode) {
+                document.body.classList.add('light-mode');
+            } else {
+                document.body.classList.remove('light-mode');
+            }
+
+            document.getElementById('dark-mode-toggle').classList.toggle('active', darkMode);
+            document.getElementById('sound-toggle').classList.toggle('active', soundEnabled);
+            document.getElementById('notification-toggle').classList.toggle('active', notificationsEnabled);
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            localStorage.setItem('darkMode', darkMode);
+            localStorage.setItem('soundEnabled', soundEnabled);
+            localStorage.setItem('notificationsEnabled', notificationsEnabled);
+        }
+
+        // Play completion sound
+        function playCompletionSound() {
+            if (soundEnabled) {
+                const audio = document.getElementById('completion-sound');
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log('Audio play failed:', e));
+            }
+        }
+
+        // Tab Navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                
+                const tabId = currentTab + '-tab';
+                document.getElementById(tabId).classList.add('active');
+
+                if (currentTab === 'calendar') {
+                    generateCalendar();
+                }
+            });
+        });
+
+        // Category Filter
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCategory = tab.dataset.category;
+                filterHabits();
+            });
+        });
+
+        function filterHabits() {
+            const habitCards = document.querySelectorAll('.habit-card:not(.add-habit-btn)');
+            habitCards.forEach(card => {
+                if (currentCategory === 'all' || card.classList.contains(currentCategory)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Habit Check Toggle
+        function initializeHabitChecks() {
+            document.querySelectorAll('.habit-check').forEach(check => {
+                check.removeEventListener('click', handleHabitCheck);
+                check.addEventListener('click', handleHabitCheck);
+            });
+        }
+        
+        function handleHabitCheck(e) {
+            e.stopPropagation();
+            const check = e.target;
+            const card = check.closest('.habit-card');
+            
+            check.classList.toggle('completed');
+            card.classList.toggle('completed');
+            
+            updateTodaySummary();
+            updateStats();
+            
+            const isCompleted = check.classList.contains('completed');
+            
+            if (isCompleted) {
+                playCompletionSound();
+            }
+            
+            showNotification(
+                isCompleted ? 'Thói quen đã hoàn thành! 🎉' : 'Đã bỏ đánh dấu hoàn thành',
+                isCompleted ? 'success' : 'warning'
+            );
+            
+            // Animation effect
+            if (isCompleted) {
+                check.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    check.style.transform = 'scale(1.1)';
+                }, 150);
+            }
+        }
+
+        // Quick Actions
+        document.querySelector('.quick-action.complete-all').addEventListener('click', () => {
+            const checks = document.querySelectorAll('.habit-check:not(.completed)');
+            if (checks.length > 0) {
+                checks.forEach(check => {
+                    check.classList.add('completed');
+                    check.closest('.habit-card').classList.add('completed');
+                });
+                updateTodaySummary();
+                updateStats();
+                playCompletionSound();
+                showNotification('Đã hoàn thành tất cả thói quen! 🏆', 'success');
+            }
+        });
+
+        document.querySelector('.quick-action.skip-all').addEventListener('click', () => {
+            const checks = document.querySelectorAll('.habit-check.completed');
+            if (checks.length > 0) {
+                checks.forEach(check => {
+                    check.classList.remove('completed');
+                    check.closest('.habit-card').classList.remove('completed');
+                });
+                updateTodaySummary();
+                updateStats();
+                showNotification('Đã bỏ đánh dấu tất cả thói quen', 'warning');
+            }
+        });
+
+        // Update Today Summary
+        function updateTodaySummary() {
+            const totalHabits = document.querySelectorAll('.habit-card:not(.add-habit-btn) .habit-check').length;
+            const completedHabits = document.querySelectorAll('.habit-card:not(.add-habit-btn) .habit-check.completed').length;
+            const percentage = totalHabits > 0 ? Math.round((completedHabits / totalHabits) * 100) : 0;
+            
+            // Update circular progress
+            const progressCircle = document.querySelector('.progress-circle');
+            const progressText = document.querySelector('.progress-text');
+            const circumference = 220;
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            if (progressCircle && progressText) {
+                progressCircle.style.strokeDashoffset = offset;
+                progressText.textContent = percentage + '%';
+            }
+            
+            // Update summary values
+            const summaryValue = document.querySelector('.summary-item:nth-child(2) .summary-value');
+            if (summaryValue) {
+                summaryValue.textContent = `${completedHabits}/${totalHabits}`;
+            }
+        }
+
+        // Update Statistics
+        function updateStats() {
+            const totalHabits = document.querySelectorAll('.habit-card:not(.add-habit-btn)').length;
+            const totalHabitsElement = document.getElementById('total-habits');
+            if (totalHabitsElement) {
+                totalHabitsElement.textContent = totalHabits;
+            }
+
+            const completedHabits = document.querySelectorAll('.habit-card:not(.add-habit-btn) .habit-check.completed').length;
+            const completionRate = totalHabits > 0 ? Math.round((completedHabits / totalHabits) * 100) : 0;
+            const completionRateElement = document.getElementById('completion-rate');
+            if (completionRateElement) {
+                completionRateElement.textContent = completionRate + '%';
+            }
+        }
+
+        // Emoji Picker
+        document.querySelectorAll('.emoji-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.emoji-option').forEach(o => o.classList.remove('selected'));
+                option.classList.add('selected');
+                document.getElementById('selected-emoji').value = option.dataset.emoji;
+            });
+        });
+
+        // Modal Functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Habit Form Submission
+        document.getElementById('habit-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const emoji = document.getElementById('selected-emoji').value;
+            const name = document.getElementById('habit-name').value.trim();
+            const description = document.getElementById('habit-description').value.trim();
+            const category = document.getElementById('habit-category').value;
+            const difficulty = document.getElementById('habit-difficulty').value;
+            const startTime = document.getElementById('habit-start-time').value;
+            const endTime = document.getElementById('habit-end-time').value;
+            const timeFrame = document.getElementById('habit-timeframe').value;
+            const frequency = document.getElementById('habit-frequency').value;
+            
+            // Validation
+            if (!name || !category || !difficulty || !timeFrame || !frequency) {
+                showNotification('Vui lòng điền đầy đủ thông tin bắt buộc!', 'error');
+                return;
+            }
+            
+            // Create new habit
+            createNewHabitCard({
+                emoji,
+                name,
+                description,
+                category,
+                difficulty,
+                startTime,
+                endTime,
+                timeFrame,
+                frequency
+            });
+            
+            showNotification('Thói quen mới đã được thêm thành công! 🎉', 'success');
+            closeModal('add-habit-modal');
+            
+            // Reset form
+            resetForm();
+            updateTodaySummary();
+            updateStats();
+        });
+
+        function resetForm() {
+            document.getElementById('habit-form').reset();
+            document.querySelectorAll('.emoji-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector('.emoji-option').classList.add('selected');
+            document.getElementById('selected-emoji').value = '🎯';
+        }
+
+        // Create New Habit Card
+        function createNewHabitCard(habitData) {
+            const habitsGrid = document.querySelector('.habits-grid');
+            const addButton = document.querySelector('.add-habit-btn');
+            
+            const habitCard = document.createElement('div');
+            habitCard.className = `habit-card ${habitData.timeFrame}`;
+            habitCard.dataset.habitId = habitIdCounter++;
+            
+            const timeText = habitData.startTime && habitData.endTime 
+                ? `${habitData.startTime} - ${habitData.endTime}`
+                : getCategoryTimeText(habitData.timeFrame);
+            
+            const categoryName = getCategoryName(habitData.category);
+            
+            habitCard.innerHTML = `
+                <div class="habit-header">
+                    <div class="habit-info">
+                        <h3 class="habit-title">
+                            <span class="habit-emoji">${habitData.emoji}</span>
+                            ${habitData.name}
+                        </h3>
+                        <p class="habit-category">${categoryName}</p>
+                        <p class="habit-time">${timeText}</p>
+                        <span class="habit-difficulty ${habitData.difficulty}">${getDifficultyText(habitData.difficulty)}</span>
+                    </div>
+                    <div class="habit-actions">
+                        <button class="habit-check">✓</button>
+                        <button class="habit-menu">⋯</button>
+                    </div>
+                </div>
+                <div class="habit-progress">
+                    <div class="habit-streak">
+                        <span class="streak-info">Streak hiện tại</span>
+                        <span class="streak-number">🔥 0 ngày</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="progress-text">0% tuần này</div>
+                </div>
+                ${habitData.description ? `<div class="habit-notes">${habitData.description}</div>` : ''}
+            `;
+            
+            // Insert before add button
+            habitsGrid.insertBefore(habitCard, addButton);
+            
+            // Initialize event listeners for new habit
+            initializeHabitChecks();
+            initializeHabitMenus();
+            
+            // Add animation
+            habitCard.style.opacity = '0';
+            habitCard.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                habitCard.style.transition = 'all 0.5s ease';
+                habitCard.style.opacity = '1';
+                habitCard.style.transform = 'translateY(0)';
+            }, 100);
+            
+            // Apply current filter
+            filterHabits();
+        }
+
+        // Helper functions
+        function getCategoryTimeText(timeFrame) {
+            const timeTexts = {
+                morning: '5:00 - 12:00',
+                afternoon: '12:00 - 18:00',
+                evening: '18:00 - 23:00',
+                anytime: 'Bất kỳ lúc nào'
+            };
+            return timeTexts[timeFrame] || 'Chưa xác định';
+        }
+        
+        function getCategoryName(category) {
+            const names = {
+                health: 'Sức khỏe',
+                learning: 'Học tập',
+                mindfulness: 'Tinh thần',
+                nutrition: 'Dinh dưỡng',
+                personal: 'Cá nhân',
+                work: 'Công việc',
+                social: 'Xã hội',
+                creative: 'Sáng tạo'
+            };
+            return names[category] || 'Khác';
+        }
+        
+        function getDifficultyText(difficulty) {
+            const texts = {
+                easy: 'Dễ',
+                medium: 'Trung bình',
+                hard: 'Khó'
+            };
+            return texts[difficulty] || 'Trung bình';
+        }
+
+        // Initialize Habit Menus
+        function initializeHabitMenus() {
+            document.querySelectorAll('.habit-menu').forEach(menu => {
+                menu.removeEventListener('click', handleHabitMenu);
+                menu.addEventListener('click', handleHabitMenu);
+            });
+        }
+
+        function handleHabitMenu(e) {
+            e.stopPropagation();
+            const habitCard = e.target.closest('.habit-card');
+            showHabitMenu(habitCard, e.target);
+        }
+
+        function showHabitMenu(habitCard, menuButton) {
+            // Remove existing menu
+            const existingMenu = document.querySelector('.habit-context-menu');
+            if (existingMenu) {
+                existingMenu.remove();
+            }
+            
+            const menu = document.createElement('div');
+            menu.className = 'habit-context-menu';
+            
+            menu.innerHTML = `
+                <div class="menu-item" data-action="edit">📝 Chỉnh sửa</div>
+                <div class="menu-item" data-action="reset">🔄 Đặt lại streak</div>
+                <div class="menu-item danger" data-action="delete">🗑️ Xóa</div>
+            `;
+            
+            // Position menu
+            const rect = menuButton.getBoundingClientRect();
+            menu.style.left = (rect.left - 100) + 'px';
+            menu.style.top = (rect.bottom + 5) + 'px';
+            
+            // Add event listeners
+            menu.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const action = item.dataset.action;
+                    handleMenuAction(action, habitCard);
+                    menu.remove();
+                });
+            });
+            
+            document.body.appendChild(menu);
+            
+            // Close menu when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menu.contains(e.target)) {
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 0);
+        }
+
+        function handleMenuAction(action, habitCard) {
+            switch(action) {
+                case 'edit':
+                    editHabit(habitCard);
+                    break;
+                case 'reset':
+                    const streakElement = habitCard.querySelector('.streak-number');
+                    const progressFill = habitCard.querySelector('.progress-fill');
+                    const progressText = habitCard.querySelector('.progress-text');
+                    
+                    if (streakElement) streakElement.textContent = '🔥 0 ngày';
+                    if (progressFill) progressFill.style.width = '0%';
+                    if (progressText) progressText.textContent = '0% tuần này';
+                    
+                    showNotification('Đã đặt lại streak thành công!', 'success');
+                    break;
+                case 'delete':
+                    if (confirm('Bạn có chắc chắn muốn xóa thói quen này?')) {
+                        habitCard.style.transition = 'all 0.3s ease';
+                        habitCard.style.opacity = '0';
+                        habitCard.style.transform = 'translateY(-20px)';
+                        setTimeout(() => {
+                            habitCard.remove();
+                            updateTodaySummary();
+                            updateStats();
+                            showNotification('Đã xóa thói quen!', 'success');
+                        }, 300);
+                    }
+                    break;
+            }
+        }
+
+        // Calendar Functions
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const calendarTitle = document.getElementById('calendar-title');
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            const monthNames = [
+                'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+            ];
+            
+            calendarTitle.textContent = `${monthNames[month]}, ${year}`;
+            
+            // Clear calendar
+            calendarGrid.innerHTML = '';
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = (firstDay.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
+            
+            // Add previous month days
+            const prevMonth = new Date(year, month - 1, 0);
+            const daysInPrevMonth = prevMonth.getDate();
+            
+            for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day other-month';
+                dayElement.textContent = daysInPrevMonth - i;
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // Add current month days
+            const today = new Date();
+            const isCurrentMonth = year === today.getFullYear() && month === today.getMonth();
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day has-habits';
+                dayElement.textContent = day;
+                
+                if (isCurrentMonth && day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // Add random completion status for demo
+                if (Math.random() > 0.3) {
+                    dayElement.classList.add('completed');
+                } else if (Math.random() > 0.5) {
+                    dayElement.classList.add('partial');
+                }
+                
+                dayElement.addEventListener('click', () => {
+                    showNotification(`Đã chọn ngày ${day}/${month + 1}/${year}`, 'success');
+                });
+                
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // Add next month days
+            const remainingDays = 42 - (startingDayOfWeek + daysInMonth);
+            for (let day = 1; day <= remainingDays; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day other-month';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // Update days in month stat
+            const daysInMonthElement = document.getElementById('days-in-month');
+            if (daysInMonthElement) {
+                daysInMonthElement.textContent = daysInMonth;
+            }
+        }
+
+        // Calendar Navigation
+        document.getElementById('prev-month').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            generateCalendar();
+        });
+
+        document.getElementById('next-month').addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            generateCalendar();
+        });
+
+        // Settings Toggle Functions
+        document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+            darkMode = !darkMode;
+            applySettings();
+            saveSettings();
+            showNotification(`Chế độ ${darkMode ? 'tối' : 'sáng'} đã được bật`, 'success');
+        });
+
+        document.getElementById('sound-toggle').addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-toggle').classList.toggle('active', soundEnabled);
+            saveSettings();
+            showNotification(`Âm thanh ${soundEnabled ? 'bật' : 'tắt'}`, 'success');
+        });
+
+        document.getElementById('notification-toggle').addEventListener('click', () => {
+            notificationsEnabled = !notificationsEnabled;
+            document.getElementById('notification-toggle').classList.toggle('active', notificationsEnabled);
+            saveSettings();
+            showNotification(`Thông báo ${notificationsEnabled ? 'bật' : 'tắt'}`, 'success');
+        });
+
+        // Export and Clear Data Functions
+        function exportData() {
+            const data = {
+                habits: Array.from(document.querySelectorAll('.habit-card:not(.add-habit-btn)')).map(card => ({
+                    title: card.querySelector('.habit-title').textContent,
+                    category: card.querySelector('.habit-category').textContent,
+                    completed: card.classList.contains('completed')
+                })),
+                settings: {
+                    darkMode,
+                    soundEnabled,
+                    notificationsEnabled
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'habit-tracker-data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Dữ liệu đã được xuất thành công!', 'success');
+        }
+
+        function clearAllData() {
+            if (confirm('Bạn có chắc chắn muốn xóa tất cả dữ liệu? Hành động này không thể hoàn tác.')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Notification Function
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Daily Quote Rotation
+        const quotes = [
+            {
+                text: "Thành công là tổng của những nỗ lực nhỏ được lặp lại ngày này qua ngày khác.",
+                author: "Robert Collier"
+            },
+            {
+                text: "Bạn không thể quay lại và thay đổi khởi đầu, nhưng bạn có thể bắt đầu từ nơi bạn đang đứng và thay đổi kết thúc.",
+                author: "C.S. Lewis"
+            },
+            {
+                text: "Động lực giúp bạn bắt đầu. Thói quen giúp bạn tiếp tục.",
+                author: "Jim Ryun"
+            },
+            {
+                text: "Chúng ta là những gì chúng ta lặp đi lặp lại. Do đó, sự xuất sắc không phải là một hành động, mà là một thói quen.",
+                author: "Aristotle"
+            }
+        ];
+
+        function rotateQuote() {
+            const quoteText = document.querySelector('.quote-text');
+            const quoteAuthor = document.querySelector('.quote-author');
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            
+            quoteText.style.opacity = '0';
+            quoteAuthor.style.opacity = '0';
+            
+            setTimeout(() => {
+                quoteText.textContent = randomQuote.text;
+                quoteAuthor.textContent = `- ${randomQuote.author}`;
+                quoteText.style.opacity = '1';
+                quoteAuthor.style.opacity = '1';
+            }, 300);
+        }
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    closeModal(modal.id);
+                });
+            }
+        });
+
+        // Edit Habit Function
+        let currentEditingHabit = null;
+
+        function editHabit(habitCard) {
+            currentEditingHabit = habitCard;
+            
+            // Extract current habit data
+            const title = habitCard.querySelector('.habit-title').textContent.trim();
+            const emoji = habitCard.querySelector('.habit-emoji').textContent;
+            const name = title.replace(emoji, '').trim();
+            const category = habitCard.querySelector('.habit-category').textContent;
+            const timeText = habitCard.querySelector('.habit-time').textContent;
+            const difficulty = habitCard.querySelector('.habit-difficulty').className.split(' ').pop();
+            const notes = habitCard.querySelector('.habit-notes')?.textContent || '';
+            
+            // Fill edit form
+            document.getElementById('edit-selected-emoji').value = emoji;
+            document.getElementById('edit-habit-name').value = name;
+            document.getElementById('edit-habit-description').value = notes;
+            document.getElementById('edit-habit-difficulty').value = difficulty;
+            
+            // Set category
+            const categorySelect = document.getElementById('edit-habit-category');
+            for (let option of categorySelect.options) {
+                if (option.text.includes(category)) {
+                    categorySelect.value = option.value;
+                    break;
+                }
+            }
+            
+            // Extract and set times
+            if (timeText.includes(' - ') && !timeText.includes('Bất kỳ')) {
+                const times = timeText.split(' - ');
+                document.getElementById('edit-habit-start-time').value = times[0];
+                document.getElementById('edit-habit-end-time').value = times[1];
+            }
+            
+            // Set timeframe based on card class
+            let timeframe = 'anytime';
+            if (habitCard.classList.contains('morning')) timeframe = 'morning';
+            else if (habitCard.classList.contains('afternoon')) timeframe = 'afternoon';
+            else if (habitCard.classList.contains('evening')) timeframe = 'evening';
+            document.getElementById('edit-habit-timeframe').value = timeframe;
+            
+            // Initialize emoji picker for edit modal
+            document.querySelectorAll('#edit-emoji-picker .emoji-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.emoji === emoji) {
+                    option.classList.add('selected');
+                }
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('#edit-emoji-picker .emoji-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    document.getElementById('edit-selected-emoji').value = option.dataset.emoji;
+                });
+            });
+            
+            openModal('edit-habit-modal');
+        }
+
+        // Edit Habit Form Submission
+        document.getElementById('edit-habit-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (!currentEditingHabit) return;
+            
+            const emoji = document.getElementById('edit-selected-emoji').value;
+            const name = document.getElementById('edit-habit-name').value.trim();
+            const description = document.getElementById('edit-habit-description').value.trim();
+            const category = document.getElementById('edit-habit-category').value;
+            const difficulty = document.getElementById('edit-habit-difficulty').value;
+            const startTime = document.getElementById('edit-habit-start-time').value;
+            const endTime = document.getElementById('edit-habit-end-time').value;
+            const timeFrame = document.getElementById('edit-habit-timeframe').value;
+            
+            if (!name || !category || !difficulty || !timeFrame) {
+                showNotification('Vui lòng điền đầy đủ thông tin bắt buộc!', 'error');
+                return;
+            }
+            
+            // Update habit card
+            updateHabitCard(currentEditingHabit, {
+                emoji, name, description, category, difficulty, startTime, endTime, timeFrame
+            });
+            
+            showNotification('Thói quen đã được cập nhật thành công! ✨', 'success');
+            closeModal('edit-habit-modal');
+            currentEditingHabit = null;
+        });
+
+        function updateHabitCard(habitCard, habitData) {
+            const timeText = habitData.startTime && habitData.endTime 
+                ? `${habitData.startTime} - ${habitData.endTime}`
+                : getCategoryTimeText(habitData.timeFrame);
+            
+            const categoryName = getCategoryName(habitData.category);
+            
+            // Update card classes
+            habitCard.className = `habit-card ${habitData.timeFrame}`;
+            if (habitCard.classList.contains('completed')) {
+                habitCard.classList.add('completed');
+            }
+            
+            // Update content
+            habitCard.querySelector('.habit-emoji').textContent = habitData.emoji;
+            habitCard.querySelector('.habit-title').innerHTML = `
+                <span class="habit-emoji">${habitData.emoji}</span>
+                ${habitData.name}
+            `;
+            habitCard.querySelector('.habit-category').textContent = categoryName;
+            habitCard.querySelector('.habit-time').textContent = timeText;
+            habitCard.querySelector('.habit-difficulty').textContent = getDifficultyText(habitData.difficulty);
+            habitCard.querySelector('.habit-difficulty').className = `habit-difficulty ${habitData.difficulty}`;
+            
+            // Update or add notes
+            let notesElement = habitCard.querySelector('.habit-notes');
+            if (habitData.description) {
+                if (!notesElement) {
+                    notesElement = document.createElement('div');
+                    notesElement.className = 'habit-notes';
+                    habitCard.appendChild(notesElement);
+                }
+                notesElement.textContent = habitData.description;
+            } else if (notesElement) {
+                notesElement.remove();
+            }
+        }
+
+        // Time Suggestion System
+        function showTimeSuggestions(category) {
+            const suggestions = getTimeSuggestions(category);
+            const suggestionList = document.getElementById('suggestion-list');
+            const panel = document.getElementById('time-suggestion-panel');
+            
+            suggestionList.innerHTML = '';
+            
+            suggestions.forEach(suggestion => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <div class="suggestion-time">${suggestion.time}</div>
+                    <div class="suggestion-reason">${suggestion.reason}</div>
+                `;
+                item.addEventListener('click', () => {
+                    applySuggestion(suggestion);
+                    closeSuggestionPanel();
+                });
+                suggestionList.appendChild(item);
+            });
+            
+            panel.style.display = 'block';
+            setTimeout(() => {
+                panel.style.opacity = '1';
+                panel.style.transform = 'translateY(-50%) scale(1)';
+            }, 10);
+        }
+
+        function getTimeSuggestions(category) {
+            const suggestions = {
+                health: [
+                    { time: '06:00 - 07:00', reason: 'Buổi sáng là thời gian tốt nhất cho hoạt động thể chất' },
+                    { time: '17:00 - 18:00', reason: 'Buổi chiều muộn giúp giải tỏa căng thẳng' },
+                    { time: '07:00 - 08:00', reason: 'Sau khi thức dậy, cơ thể đã sẵn sàng vận động' }
+                ],
+                learning: [
+                    { time: '08:00 - 09:00', reason: 'Đầu óc minh mẫn nhất vào buổi sáng' },
+                    { time: '14:00 - 15:00', reason: 'Sau bữa trưa, não bộ hoạt động tốt' },
+                    { time: '20:00 - 21:00', reason: 'Buổi tối yên tĩnh, dễ tập trung' }
+                ],
+                mindfulness: [
+                    { time: '06:30 - 06:45', reason: 'Bắt đầu ngày với tâm trạng bình an' },
+                    { time: '12:00 - 12:15', reason: 'Giữa trưa giúp tái tạo năng lượng' },
+                    { time: '21:30 - 21:45', reason: 'Cuối ngày để thư giãn và nghỉ ngơi' }
+                ],
+                nutrition: [
+                    { time: '07:00 - 08:00', reason: 'Bữa sáng là bữa quan trọng nhất' },
+                    { time: '10:00 - 10:15', reason: 'Bữa phụ buổi sáng bổ sung năng lượng' },
+                    { time: '15:00 - 15:15', reason: 'Bữa phụ chiều giúp duy trì đường huyết' }
+                ],
+                personal: [
+                    { time: '21:00 - 21:30', reason: 'Cuối ngày để suy ngẫm và ghi chép' },
+                    { time: '19:00 - 19:30', reason: 'Sau bữa tối, tâm trạng thoải mái' },
+                    { time: '22:00 - 22:15', reason: 'Trước khi ngủ để tổng kết ngày' }
+                ]
+            };
+            
+            return suggestions[category] || [
+                { time: '09:00 - 10:00', reason: 'Thời gian linh hoạt phù hợp mọi hoạt động' },
+                { time: '14:00 - 15:00', reason: 'Buổi chiều năng suất cao' },
+                { time: '19:00 - 20:00', reason: 'Buổi tối thư giãn' }
+            ];
+        }
+
+        function applySuggestion(suggestion) {
+            const times = suggestion.time.split(' - ');
+            document.getElementById('habit-start-time').value = times[0];
+            document.getElementById('habit-end-time').value = times[1];
+            
+            // Also apply to edit form if open
+            if (document.getElementById('edit-habit-modal').classList.contains('active')) {
+                document.getElementById('edit-habit-start-time').value = times[0];
+                document.getElementById('edit-habit-end-time').value = times[1];
+            }
+            
+            showNotification(`Đã áp dụng thời gian đề xuất: ${suggestion.time}`, 'success');
+        }
+
+        function closeSuggestionPanel() {
+            const panel = document.getElementById('time-suggestion-panel');
+            panel.style.opacity = '0';
+            panel.style.transform = 'translateY(-50%) scale(0.9)';
+            setTimeout(() => {
+                panel.style.display = 'none';
+            }, 300);
+        }
+
+        // Add suggestion trigger when category changes
+        document.getElementById('habit-category').addEventListener('change', function() {
+            if (this.value) {
+                setTimeout(() => {
+                    showTimeSuggestions(this.value);
+                }, 500);
+            }
+        });
+
+        document.getElementById('edit-habit-category').addEventListener('change', function() {
+            if (this.value) {
+                setTimeout(() => {
+                    showTimeSuggestions(this.value);
+                }, 500);
+            }
+        });
+
+        // Smart time validation
+        function validateTimeInput() {
+            const startTime = document.getElementById('habit-start-time').value;
+            const endTime = document.getElementById('habit-end-time').value;
+            
+            if (startTime && endTime) {
+                const start = new Date(`2000-01-01T${startTime}`);
+                const end = new Date(`2000-01-01T${endTime}`);
+                
+                if (start >= end) {
+                    showNotification('Thời gian kết thúc phải sau thời gian bắt đầu!', 'warning');
+                    return false;
+                }
+                
+                const duration = (end - start) / (1000 * 60); // minutes
+                if (duration < 5) {
+                    showNotification('Thói quen nên kéo dài ít nhất 5 phút!', 'warning');
+                    return false;
+                } else if (duration > 480) { // 8 hours
+                    showNotification('Thói quen không nên quá 8 tiếng!', 'warning');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // Add time validation to inputs
+        document.getElementById('habit-end-time').addEventListener('change', validateTimeInput);
+        document.getElementById('edit-habit-end-time').addEventListener('change', validateTimeInput);
+
+        // Enhanced Refresh System
+        let pullDistance = 0;
+        let isPulling = false;
+        let startY = 0;
+        let autoRefreshInterval = null;
+
+        function initializeRefreshSystem() {
+            // Pull-to-refresh functionality
+            document.addEventListener('touchstart', handleTouchStart, { passive: true });
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+            // Auto-refresh every 5 minutes
+            startAutoRefresh();
+        }
+
+        function handleTouchStart(e) {
+            if (window.scrollY === 0) {
+                startY = e.touches[0].clientY;
+                isPulling = true;
+            }
+        }
+
+        function handleTouchMove(e) {
+            if (!isPulling) return;
+            
+            const currentY = e.touches[0].clientY;
+            pullDistance = Math.max(0, currentY - startY);
+            
+            if (pullDistance > 0) {
+                e.preventDefault();
+                updatePullIndicator();
+            }
+        }
+
+        function handleTouchEnd() {
+            if (!isPulling) return;
+            
+            isPulling = false;
+            
+            if (pullDistance > 80) {
+                triggerRefresh();
+            } else {
+                resetPullIndicator();
+            }
+            
+            pullDistance = 0;
+        }
+
+        function updatePullIndicator() {
+            const indicator = document.getElementById('pull-to-refresh');
+            const progress = Math.min(pullDistance / 80, 1);
+            
+            if (progress > 0) {
+                indicator.classList.add('active');
+                indicator.style.transform = `translateX(-50%) translateY(${Math.min(pullDistance - 60, 20)}px) scale(${0.8 + (progress * 0.2)})`;
+                indicator.style.opacity = progress;
+                
+                if (progress >= 1) {
+                    indicator.querySelector('span').textContent = 'Thả để làm mới...';
+                } else {
+                    indicator.querySelector('span').textContent = 'Kéo để làm mới...';
+                }
+            }
+        }
+
+        function resetPullIndicator() {
+            const indicator = document.getElementById('pull-to-refresh');
+            indicator.classList.remove('active');
+            indicator.style.transform = 'translateX(-50%)';
+            indicator.style.opacity = '0';
+            indicator.querySelector('span').textContent = 'Kéo để làm mới...';
+        }
+
+        function triggerRefresh() {
+            showPageTransition();
+            
+            // Simulate refresh delay
+            setTimeout(() => {
+                performRefresh();
+                hidePageTransition();
+                showAutoRefreshIndicator('Dữ liệu đã được làm mới!');
+            }, 1500);
+            
+            resetPullIndicator();
+        }
+
+        function manualRefresh() {
+            showPageTransition();
+            
+            setTimeout(() => {
+                performRefresh();
+                hidePageTransition();
+                showAutoRefreshIndicator('Đã làm mới thành công!');
+            }, 1000);
+        }
+
+        function performRefresh() {
+            // Refresh all data and UI
+            updateTodaySummary();
+            updateStats();
+            generateCalendar();
+            filterHabits();
+            
+            // Refresh habit checks for today
+            const today = new Date().toDateString();
+            const todayHabits = document.querySelectorAll('.habit-card');
+            
+            todayHabits.forEach(card => {
+                const checkbox = card.querySelector('.habit-checkbox');
+                if (checkbox) {
+                    // Re-initialize checkbox state
+                    initializeHabitCheck(checkbox);
+                }
+            });
+            
+            // Update progress animations
+            document.querySelectorAll('.progress-fill').forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            });
+        }
+
+        function showPageTransition() {
+            document.getElementById('page-transition').classList.add('active');
+        }
+
+        function hidePageTransition() {
+            document.getElementById('page-transition').classList.remove('active');
+        }
+
+        function showAutoRefreshIndicator(message) {
+            const indicator = document.getElementById('auto-refresh-indicator');
+            indicator.textContent = message;
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 3000);
+        }
+
+        function startAutoRefresh() {
+            // Auto refresh every 5 minutes
+            autoRefreshInterval = setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    performRefresh();
+                    showAutoRefreshIndicator('Tự động cập nhật dữ liệu');
+                }
+            }, 300000); // 5 minutes
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // Enhanced page visibility handling
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                // Page became visible, refresh data
+                setTimeout(() => {
+                    performRefresh();
+                    showAutoRefreshIndicator('Chào mừng quay lại!');
+                }, 500);
+            }
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            initializeHabitChecks();
+            initializeHabitMenus();
+            updateTodaySummary();
+            updateStats();
+            generateCalendar();
+            initializeRefreshSystem();
+            
+            // Rotate quote every 30 seconds
+            setInterval(rotateQuote, 30000);
+            
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Chào mừng bạn quay lại! Hãy bắt đầu ngày mới với những thói quen tích cực!', 'success');
+            }, 1000);
+            
+            filterHabits();
+        });
+    </script>
+</body>
+</html>
