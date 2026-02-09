@@ -1,4 +1,3 @@
-# ペットクリニック管理システム  
 Pet Clinic Management System
 
 ---
