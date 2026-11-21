@@ -151,7 +151,7 @@ Chatwork: https://www.chatwork.com/030805
 
 ---
 
-# Backend & AI Portfolio（Tiếng Việt）
+# Backend & AI Portfolio
 
 ## 1. Tổng quan
 Repository này là portfolio tổng hợp các dự án và kết quả học tập  
